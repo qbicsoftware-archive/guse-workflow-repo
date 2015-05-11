@@ -1,0 +1,708 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<workflow download="all" export="proj" mainabst="" maingraf="XTandemPeptideID-ver2_2015-02-25-172021" mainreal="PepIdXtandem-ver2-withctds" name="PepIdXtandem-ver2-withctds">
+   <graf name="XTandemPeptideID-ver2_2015-02-25-172021" text="Description of Graph">
+      <job name="DataStaging-mzML" text="Data staging node providing the primary data (mzML) to the workflow.&#10;&#10;IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths in the openBIS DSS). This information comes from the portal.&#10;&#10;IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.&#10;&#10;OUT-STAGEDFILES: Generator port yielding a list of the staged files." x="216" y="69">
+         <input name="IN-FILESTOSTAGE" prejob="" preoutput="" seq="0" text="IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths in the openBIS DSS). This information comes from the portal." x="231" y="54"/>
+         <input name="IN-JOBNAME" prejob="" preoutput="" seq="2" text="IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes." x="215" y="54"/>
+         <output name="OUT-STAGEDFILES" seq="1" text="OUT_STAGEDFILES: Generator port yielding a list of the staged files." x="215" y="129"/>
+      </job>
+      <job name="XTandemAdapter" text="X!TandemAdapter from the OpenMS library (peptide ID).&#10;&#10;IN-MZML: input mzML file(s) (with MS2 spectra)&#10;IN-CTD: X!TandemAdapter parameter file&#10;IN-FASTA: protein DB with appended decoy data&#10;&#10;OUT-IDXML: peptide idXML file(s)" x="216" y="202">
+         <input name="IN-MZML" prejob="DataStaging-mzML" preoutput="1" seq="0" text="IN-MZML: input mzML file(s) (with MS2 spectra)" x="215" y="187"/>
+         <input name="IN-CTD" prejob="" preoutput="" seq="1" text="IN-CTD: X!TandemAdapter parameter file" x="246" y="187"/>
+         <input name="IN-FASTA" prejob="DecoyDatabase" preoutput="2" seq="2" text="IN-FASTA: protein DB with appended decoy data" x="262" y="262"/>
+         <output name="OUT-IDXML" seq="3" text="OUT-IDXML: peptide idXML file(s)" x="276" y="201"/>
+      </job>
+      <job name="DataStaging-fasta" text="Data staging node to provide the input of the following node.&#10;&#10;IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths in the openBIS DSS). This information comes from the portal.&#10;&#10;IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.&#10;&#10;OUT-STAGEDFILES: Generator port yielding a list of the staged files." x="37" y="326">
+         <input name="IN-FILESTOSTAGE" prejob="" preoutput="" seq="0" text="IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths in the openBIS DSS). This information comes from the portal." x="52" y="311"/>
+         <input name="IN-JOBNAME" prejob="" preoutput="" seq="2" text="IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes." x="36" y="311"/>
+         <output name="OUT-STAGEDFILES" seq="1" text="OUT-STAGEDFILES: Generator port yielding a list of the staged files." x="97" y="325"/>
+      </job>
+      <job name="DecoyDatabase" text="DecoyDatabase from the OpenMS library (peptide ID).&#10;&#10;IN-FASTA: protein DB (without decoy information)&#10;IN-CTD: parameter file (-append decoys)&#10;&#10;OUT-FASTA: protein DB with appended decoy data" x="216" y="326">
+         <input name="IN-FASTA" prejob="DataStaging-fasta" preoutput="1" seq="0" text="IN-FASTA: protein DB (without decoy information)" x="201" y="325"/>
+         <input name="IN-CTD" prejob="" preoutput="" seq="1" text="IN-CTD: parameter file (-append decoys)" x="246" y="311"/>
+         <output name="OUT-FASTA" seq="2" text="OUT-FASTA: protein DB with appended decoy data" x="276" y="325"/>
+      </job>
+      <job name="IDMerger" text="IDMerger from the OpenMS library (peptide ID).&#10;&#10;IN-IDXML: input idXML file(s) (collector port)&#10;IN-CTD: parameter file&#10;&#10;OUT-IDXML: merged peptide idXML file" x="360" y="202">
+         <input name="IN-IDXML" prejob="XTandemAdapter" preoutput="3" seq="0" text="IN-IDXML: input idXML file(s) (collector port)" x="345" y="201"/>
+         <input name="IN-CTD" prejob="" preoutput="" seq="1" text="IN-CTD: parameter file" x="375" y="187"/>
+         <output name="OUT-IDXML" seq="2" text="OUT-IDXML: merged peptide idXML file" x="420" y="201"/>
+      </job>
+      <job name="PeptideIndexer" text="PeptideIndexer from the OpenMS library (peptide ID).&#10;&#10;IN-IDXML: input idXML file&#10;IN-CTD: parameter file&#10;IN-FASTA: protein DB (with decoy information)&#10;&#10;OUT-IDXML: indexed peptide idXML file" x="503" y="202">
+         <input name="IN-IDXML" prejob="IDMerger" preoutput="2" seq="0" text="IN-IDXML: input idXML file" x="488" y="201"/>
+         <input name="IN-CTD" prejob="" preoutput="" seq="1" text="IN-CTD: parameter file" x="518" y="187"/>
+         <input name="IN-FASTA" prejob="DecoyDatabase" preoutput="2" seq="2" text="IN-FASTA: protein DB (with decoy information)" x="488" y="248"/>
+         <output name="OUT-IDXML" seq="3" text="OUT-IDXML: indexed peptide idXML file" x="563" y="201"/>
+      </job>
+      <job name="FalseDiscoveryRate" text="FalseDiscoveryRate from the OpenMS library (peptide ID).&#10;&#10;IN-IDXML: input idXML file&#10;IN-CTD: parameter file&#10;&#10;OUT-IDXML: peptide idXML file with annotated FDR" x="650" y="202">
+         <input name="IN-IDXML" prejob="PeptideIndexer" preoutput="3" seq="0" text="IN-IDXML: input idXML file" x="635" y="201"/>
+         <input name="IN-CTD" prejob="" preoutput="" seq="1" text="IN-CTD: parameter file" x="665" y="187"/>
+         <output name="OUT-IDXML" seq="2" text="OUT-IDXML: peptide idXML file with annotated FDR" x="710" y="201"/>
+      </job>
+      <job name="IDFilter" text="IDFilter from the OpenMS library (peptide ID).&#10;&#10;IN-IDXML: input idXML file&#10;IN-CTD: parameter file&#10;&#10;OUT-IDXML: FDR-filtered peptide idXML file" x="797" y="202">
+         <input name="IN-IDXML" prejob="FalseDiscoveryRate" preoutput="2" seq="0" text="IN-IDXML: input idXML file" x="782" y="201"/>
+         <input name="IN-CTD" prejob="" preoutput="" seq="1" text="IN-CTD: parameter file" x="812" y="187"/>
+         <output name="OUT-IDXML" seq="2" text="OUT-IDXML: FDR-filtered peptide idXML file" x="857" y="201"/>
+      </job>
+      <job name="DataStaging-writeResults" text="Data staging node writing back the results to openBIS.&#10;&#10;IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths of result files on scratch).&#10;&#10;IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.&#10;&#10;IN-REGISTERNAME: This is the prefix of the results folder name (e.g. SPACE-PROJECT-EXPERIMENT) that is reported back to openBIS." x="948" y="202">
+         <input name="IN-FILESTOSTAGE" prejob="IDFilter" preoutput="2" seq="0" text="IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths of result files on scratch)." x="933" y="201"/>
+         <input name="IN-JOBNAME" prejob="" preoutput="" seq="1" text="IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes." x="947" y="187"/>
+         <input name="IN-REGISTERNAME" prejob="" preoutput="" seq="2" text="IN-REGISTERNAME: This is the prefix of the results folder name (e.g. SPACE-PROJECT-EXPERIMENT) that is reported back to openBIS" x="963" y="187"/>
+      </job>
+   </graf>
+   <real abst="" graf="XTandemPeptideID-ver2_2015-02-25-172021" name="PepIdXtandem-ver2-withctds" text="2015-5-7">
+      <job name="DataStaging-fasta" text="Data staging node to provide the input of the following node.&#10;&#10;IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths in the openBIS DSS). This information comes from the portal.&#10;&#10;IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.&#10;&#10;OUT-STAGEDFILES: Generator port yielding a list of the staged files." x="37" y="326">
+         <input name="IN-FILESTOSTAGE" prejob="" preoutput="" seq="0" text="IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths in the openBIS DSS). This information comes from the portal." x="52" y="311">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="file" label="null" value="C:/fakepath/FileParameterTest.ctd"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-FILESTOSTAGE"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <input name="IN-JOBNAME" prejob="" preoutput="" seq="2" text="IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes." x="36" y="311">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="file" label="null" value="inputJobName.in"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-JOBNAME"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="2"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <output name="OUT-STAGEDFILES" seq="1" text="OUT-STAGEDFILES: Generator port yielding a list of the staged files." x="97" y="325">
+            <port_prop desc="null" inh="null" key="maincount0" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="type0" label="null" value="permament"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="OUT-STAGEDFILES"/>
+            <port_prop desc="null" inh="null" key="maincount" label="null" value="1"/>
+         </output>
+         <execute desc="null" inh="null" key="binary" label="null" value="C:/fakepath/main.sh.app.tgz"/>
+         <execute desc="null" inh="null" key="gridtype" label="null" value="moab"/>
+         <execute desc="null" inh="null" key="jobmanager" label="null" value="-"/>
+         <execute desc="null" inh="null" key="jobistype" label="null" value="binary"/>
+         <execute desc="null" inh="null" key="resource" label="null" value="cfc"/>
+         <execute desc="null" inh="null" key="grid" label="null" value="qbicheadnode.local"/>
+         <execute desc="null" inh="null" key="params" label="null" value="IN-FILESTOSTAGE IN-JOBNAME"/>
+         <execute desc="null" inh="null" key="type" label="null" value="Sequence"/>
+         <description key="moab.keydirectives" value="#MSUB -l nodes=1:qbicds -A qbicds -q qbicds"/>
+         <history mdyid="modify.job.breaktimeout" nvalue="0" ovalue="60" port="-" tim="2015-05-07-11:04:35" user="11903"/>
+         <history mdyid="modify.job.binary" nvalue="C:/fakepath/main.sh.app.tgz" ovalue="dataStagingSingleMoab.sh" port="-" tim="2015-05-07-10:57:20" user="11903"/>
+         <history mdyid="new.job.breakpoint" nvalue="none" ovalue="" port="-" tim="2015-05-07-10:57:20" user="11903"/>
+         <history mdyid="new.job.breaktimeout" nvalue="60" ovalue="" port="-" tim="2015-05-07-10:57:20" user="11903"/>
+         <history mdyid="modify.input.file" nvalue="C:/fakepath/FileParameterTest.ctd" ovalue="inputFasta.in" port="0" tim="2015-05-07-10:57:20" user="11903"/>
+         <history mdyid="new.job.params" nvalue="IN-FILESTOSTAGE OUT-STAGEDFILES" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.grid" nvalue="dci-bridge host(64bit)" ovalue="qbicheadnode.local" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.job.jobmanager" nvalue="" ovalue="-" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.job.resource" nvalue="" ovalue="cfc" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.gridtype" nvalue="local" ovalue="moab" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqluser" nvalue="test@liferay.com" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqlpass" nvalue="t3st1ng123!!" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-JOBNAME" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.file" nvalue="inputJobName.in" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="2" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqlpass" nvalue="" ovalue="t3st1ng123!!" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqluser" nvalue="" ovalue="test@liferay.com" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.params" nvalue="IN-FILESTOSTAGE IN-JOBNAME" ovalue="IN-FILESTOSTAGE OUT-STAGEDFILES" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -l nodes=1:qbicds -A qbicds -q qbicds" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.resource" nvalue="cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobmanager" nvalue="-" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.grid" nvalue="qbicheadnode.local" ovalue="dci-bridge host(64bit)" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.gridtype" nvalue="moab" ovalue="local" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.binary" nvalue="dataStagingSingleMoab.sh" ovalue="dataStagingSingle.sh" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.breaktimeout" nvalue="0" ovalue="60" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.type0" nvalue="permament" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.maincount0" nvalue="1" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-FILESTOSTAGE" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.file" nvalue="inputFasta.in" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breaktimeout" nvalue="60" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.type" nvalue="Sequence" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.grid" nvalue="qbicheadnode.local" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.resource" nvalue="cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breakpoint" nvalue="none" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobistype" nvalue="binary" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobmanager" nvalue="-" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.binary" nvalue="dataStagingSingle.sh" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.gridtype" nvalue="moab" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+      </job>
+      <job name="DataStaging-mzML" text="Data staging node providing the primary data (mzML) to the workflow.&#10;&#10;IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths in the openBIS DSS). This information comes from the portal.&#10;&#10;IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.&#10;&#10;OUT-STAGEDFILES: Generator port yielding a list of the staged files." x="216" y="69">
+         <input name="IN-FILESTOSTAGE" prejob="" preoutput="" seq="0" text="IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths in the openBIS DSS). This information comes from the portal." x="231" y="54">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="file" label="null" value="C:/fakepath/pepid_FileListParameterTest.ctd"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-FILESTOSTAGE"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <input name="IN-JOBNAME" prejob="" preoutput="" seq="2" text="IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes." x="215" y="54">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="file" label="null" value="inputJobName.in"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-JOBNAME"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="2"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <output name="OUT-STAGEDFILES" seq="1" text="OUT_STAGEDFILES: Generator port yielding a list of the staged files." x="215" y="129">
+            <port_prop desc="null" inh="null" key="maincount0" label="null" value="2"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="OUT-STAGEDFILES"/>
+            <port_prop desc="null" inh="null" key="type0" label="null" value="permament"/>
+            <port_prop desc="null" inh="null" key="maincount" label="null" value="2"/>
+         </output>
+         <execute desc="null" inh="null" key="gridtype" label="null" value="moab"/>
+         <execute desc="null" inh="null" key="binary" label="null" value="C:/fakepath/main.sh.app.tgz"/>
+         <execute desc="null" inh="null" key="jobmanager" label="null" value="-"/>
+         <execute desc="null" inh="null" key="jobistype" label="null" value="binary"/>
+         <execute desc="null" inh="null" key="resource" label="null" value="cfc"/>
+         <execute desc="null" inh="null" key="grid" label="null" value="qbicheadnode.local"/>
+         <execute desc="null" inh="null" key="params" label="null" value="IN-FILESTOSTAGE IN-JOBNAME"/>
+         <execute desc="null" inh="null" key="type" label="null" value="Sequence"/>
+         <description key="moab.keydirectives" value="#MSUB -l nodes=1:qbicds -A qbicds -q qbicds"/>
+         <history mdyid="modify.input.file" nvalue="C:/fakepath/pepid_FileListParameterTest.ctd" ovalue="C:/fakepath/FileListParameterTest.ctd" port="0" tim="2015-05-07-13:53:21" user="11903"/>
+         <history mdyid="modify.job.breaktimeout" nvalue="0" ovalue="60" port="-" tim="2015-05-07-11:04:35" user="11903"/>
+         <history mdyid="modify.job.binary" nvalue="C:/fakepath/main.sh.app.tgz" ovalue="dataStagingMoab.sh" port="-" tim="2015-05-07-10:57:20" user="11903"/>
+         <history mdyid="new.job.breakpoint" nvalue="none" ovalue="" port="-" tim="2015-05-07-10:57:20" user="11903"/>
+         <history mdyid="new.job.breaktimeout" nvalue="60" ovalue="" port="-" tim="2015-05-07-10:57:20" user="11903"/>
+         <history mdyid="modify.input.file" nvalue="C:/fakepath/FileListParameterTest.ctd" ovalue="inputMzML.in" port="0" tim="2015-05-07-10:57:20" user="11903"/>
+         <history mdyid="modify.desc.moab.keydirectives" nvalue="#MSUB -l nodes=1:qbicds -A qbicds -q qbicds" ovalue="#MSUB -I -l nodes=1:qbicds -A qbicds -q qbicds" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.desc.moab.keydirectives" nvalue="#MSUB -I -l nodes=1:qbicds -A qbicds -q qbicds" ovalue="#MSUB -I -l nodes=1:qbicds -A qbicds -q qbicds ##NAME iisek01" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.binary" nvalue="dataStagingMoab.sh" ovalue="dataStaging.sh" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.gridtype" nvalue="moab" ovalue="local" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.grid" nvalue="qbicheadnode.local" ovalue="dci-bridge host(64bit)" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobmanager" nvalue="-" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.resource" nvalue="cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -I -l nodes=1:qbicds -A qbicds -q qbicds ##NAME iisek01" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.params" nvalue="IN-FILESTOSTAGE IN-JOBNAME" ovalue="IN-FILESTOSTAGE" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqluser" nvalue="" ovalue="test@liferay.com" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqlpass" nvalue="" ovalue="t3st1ng123!!" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="2" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-JOBNAME" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.file" nvalue="inputJobName.in" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqluser" nvalue="test@liferay.com" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqlpass" nvalue="t3st1ng123!!" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqlpass" nvalue="" ovalue="t3st1ng123!!" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqluser" nvalue="" ovalue="test@liferay.com" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqlpass" nvalue="t3st1ng123!!" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqluser" nvalue="test@liferay.com" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqlpass" nvalue="" ovalue="t3st1ng123!!" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqluser" nvalue="" ovalue="test@liferay.com" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.gridtype" nvalue="local" ovalue="moab" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.job.jobmanager" nvalue="" ovalue="-" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.job.resource" nvalue="" ovalue="cfc" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.grid" nvalue="dci-bridge host(64bit)" ovalue="qbicheadnode.local" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqlpass" nvalue="t3st1ng123!!" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqluser" nvalue="test@liferay.com" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.params" nvalue="IN-FILESTOSTAGE" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.breaktimeout" nvalue="0" ovalue="60" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqluser" nvalue="" ovalue="test@liferay.com" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqlpass" nvalue="" ovalue="t3st1ng123!!" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqluser" nvalue="test@liferay.com" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqlpass" nvalue="t3st1ng123!!" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.type0" nvalue="permament" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.maincount0" nvalue="2" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.output.maincount" nvalue="2" ovalue="1" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-FILESTOSTAGE" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.file" nvalue="inputMzML.in" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.type" nvalue="Sequence" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breaktimeout" nvalue="60" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.resource" nvalue="cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.grid" nvalue="qbicheadnode.local" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breakpoint" nvalue="none" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobistype" nvalue="binary" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobmanager" nvalue="-" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.binary" nvalue="dataStaging.sh" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.gridtype" nvalue="moab" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+      </job>
+      <job name="DataStaging-writeResults" text="Data staging node writing back the results to openBIS.&#10;&#10;IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths of result files on scratch).&#10;&#10;IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.&#10;&#10;IN-REGISTERNAME: This is the prefix of the results folder name (e.g. SPACE-PROJECT-EXPERIMENT) that is reported back to openBIS." x="948" y="202">
+         <input name="IN-FILESTOSTAGE" prejob="IDFilter" preoutput="2" seq="0" text="IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths of result files on scratch)." x="933" y="201">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="waitingtmp" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="waiting" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-FILESTOSTAGE"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <input name="IN-JOBNAME" prejob="" preoutput="" seq="1" text="IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes." x="947" y="187">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="file" label="null" value="inputJobName.in"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-JOBNAME"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <input name="IN-REGISTERNAME" prejob="" preoutput="" seq="2" text="IN-REGISTERNAME: This is the prefix of the results folder name (e.g. SPACE-PROJECT-EXPERIMENT) that is reported back to openBIS" x="963" y="187">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="file" label="null" value="inputRegisterName.in"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-REGISTERNAME"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="2"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <execute desc="null" inh="null" key="gridtype" label="null" value="moab"/>
+         <execute desc="null" inh="null" key="binary" label="null" value="C:/fakepath/datastaging-results.sh"/>
+         <execute desc="null" inh="null" key="jobmanager" label="null" value="-"/>
+         <execute desc="null" inh="null" key="jobistype" label="null" value="binary"/>
+         <execute desc="null" inh="null" key="resource" label="null" value="cfc"/>
+         <execute desc="null" inh="null" key="grid" label="null" value="qbicheadnode.local"/>
+         <execute desc="null" inh="null" key="params" label="null" value="IN-FILESTOSTAGE IN-JOBNAME IN-REGISTERNAME"/>
+         <execute desc="null" inh="null" key="type" label="null" value="Sequence"/>
+         <description key="moab.keydirectives" value="#MSUB -l nodes=1:qbicds -A qbicds -q qbicds"/>
+         <history mdyid="modify.job.binary" nvalue="C:/fakepath/datastaging-results.sh" ovalue="dataStagingOutgoingMoab.sh" port="-" tim="2015-05-07-14:47:27" user="11903"/>
+         <history mdyid="new.job.breakpoint" nvalue="none" ovalue="" port="-" tim="2015-05-07-14:47:27" user="11903"/>
+         <history mdyid="new.job.breaktimeout" nvalue="60" ovalue="" port="-" tim="2015-05-07-14:47:27" user="11903"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -l nodes=1:qbicds -A qbicds -q qbicds" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.binary" nvalue="dataStagingOutgoingMoab.sh" ovalue="dataStagingOutgoing.sh" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.gridtype" nvalue="moab" ovalue="local" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.grid" nvalue="qbicheadnode.local" ovalue="dci-bridge host(64bit)" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobmanager" nvalue="-" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.resource" nvalue="cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.params" nvalue="IN-FILESTOSTAGE IN-JOBNAME IN-REGISTERNAME" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.job.resource" nvalue="" ovalue="cfc" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.grid" nvalue="dci-bridge host(64bit)" ovalue="qbicheadnode.local" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.job.jobmanager" nvalue="" ovalue="-" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.gridtype" nvalue="local" ovalue="moab" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.binary" nvalue="dataStagingOutgoing.sh" ovalue="dummyScript.sh" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqluser" nvalue="" ovalue="test@liferay.com" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqlpass" nvalue="" ovalue="t3st1ng123!!" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="2" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-REGISTERNAME" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.file" nvalue="inputRegisterName.in" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqluser" nvalue="test@liferay.com" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="1" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqlpass" nvalue="t3st1ng123!!" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-JOBNAME" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.file" nvalue="inputJobName.in" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-FILESTOSTAGE" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waiting" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waitingtmp" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.breaktimeout" nvalue="0" ovalue="60" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breaktimeout" nvalue="60" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.type" nvalue="Sequence" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breakpoint" nvalue="none" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.binary" nvalue="dummyScript.sh" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.grid" nvalue="qbicheadnode.local" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.resource" nvalue="cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobistype" nvalue="binary" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobmanager" nvalue="-" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.gridtype" nvalue="moab" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+      </job>
+      <job name="DecoyDatabase" text="DecoyDatabase from the OpenMS library (peptide ID).&#10;&#10;IN-FASTA: protein DB (without decoy information)&#10;IN-CTD: parameter file (-append decoys)&#10;&#10;OUT-FASTA: protein DB with appended decoy data" x="216" y="326">
+         <input name="IN-FASTA" prejob="DataStaging-fasta" preoutput="1" seq="0" text="IN-FASTA: protein DB (without decoy information)" x="201" y="325">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="waitingtmp" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="waiting" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-FASTA"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <input name="IN-CTD" prejob="" preoutput="" seq="1" text="IN-CTD: parameter file (-append decoys)" x="246" y="311">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="file" label="null" value="DecoyDatabase.ctd"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-CTD"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <output name="OUT-FASTA" seq="2" text="OUT-FASTA: protein DB with appended decoy data" x="276" y="325">
+            <port_prop desc="null" inh="null" key="maincount0" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="OUT-FASTA"/>
+            <port_prop desc="null" inh="null" key="type0" label="null" value="permament"/>
+            <port_prop desc="null" inh="null" key="maincount" label="null" value="1"/>
+         </output>
+         <execute desc="null" inh="null" key="binary" label="null" value="openmsSimple.sh"/>
+         <execute desc="null" inh="null" key="gridtype" label="null" value="moab"/>
+         <execute desc="null" inh="null" key="jobmanager" label="null" value="-"/>
+         <execute desc="null" inh="null" key="jobistype" label="null" value="binary"/>
+         <execute desc="null" inh="null" key="resource" label="null" value="cfc"/>
+         <execute desc="null" inh="null" key="grid" label="null" value="qbicheadnode.local"/>
+         <execute desc="null" inh="null" key="params" label="null" value="DecoyDatabase IN-CTD IN-FASTA tmp.fasta OUT-FASTA"/>
+         <execute desc="null" inh="null" key="type" label="null" value="Sequence"/>
+         <description key="moab.keydirectives" value="#MSUB -lnodes=1:ppn=1:cfc"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-26-11:25:39" user="11903"/>
+         <history mdyid="modify.job.params" nvalue="DecoyDatabase IN-CTD IN-FASTA tmp.fasta OUT-FASTA" ovalue="DecoyDatabase IN-CTD IN-FASTA OUT-FASTA" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.params" nvalue="DecoyDatabase IN-CTD IN-FASTA OUT-FASTA" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.breaktimeout" nvalue="0" ovalue="60" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.type0" nvalue="permament" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.maincount0" nvalue="1" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="1" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-CTD" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.file" nvalue="DecoyDatabase.ctd" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-FASTA" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waiting" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waitingtmp" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breaktimeout" nvalue="60" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.grid" nvalue="qbicheadnode.local" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.type" nvalue="Sequence" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.resource" nvalue="cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breakpoint" nvalue="none" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobistype" nvalue="binary" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobmanager" nvalue="-" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.binary" nvalue="openmsSimple.sh" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.gridtype" nvalue="moab" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+      </job>
+      <job name="FalseDiscoveryRate" text="FalseDiscoveryRate from the OpenMS library (peptide ID).&#10;&#10;IN-IDXML: input idXML file&#10;IN-CTD: parameter file&#10;&#10;OUT-IDXML: peptide idXML file with annotated FDR" x="650" y="202">
+         <input name="IN-IDXML" prejob="PeptideIndexer" preoutput="3" seq="0" text="IN-IDXML: input idXML file" x="635" y="201">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="waitingtmp" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="waiting" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-IDXML"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <input name="IN-CTD" prejob="" preoutput="" seq="1" text="IN-CTD: parameter file" x="665" y="187">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="file" label="null" value="FalseDiscoveryRate.ctd"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-CTD"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <output name="OUT-IDXML" seq="2" text="OUT-IDXML: peptide idXML file with annotated FDR" x="710" y="201">
+            <port_prop desc="null" inh="null" key="maincount0" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="type0" label="null" value="permament"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="OUT-IDXML"/>
+            <port_prop desc="null" inh="null" key="maincount" label="null" value="1"/>
+         </output>
+         <execute desc="null" inh="null" key="gridtype" label="null" value="moab"/>
+         <execute desc="null" inh="null" key="binary" label="null" value="openmsSimple.sh"/>
+         <execute desc="null" inh="null" key="jobmanager" label="null" value="-"/>
+         <execute desc="null" inh="null" key="jobistype" label="null" value="binary"/>
+         <execute desc="null" inh="null" key="resource" label="null" value="cfc"/>
+         <execute desc="null" inh="null" key="grid" label="null" value="qbicheadnode.local"/>
+         <execute desc="null" inh="null" key="params" label="null" value="FalseDiscoveryRate IN-CTD IN-IDXML tmp.idXML OUT-IDXML"/>
+         <execute desc="null" inh="null" key="type" label="null" value="Sequence"/>
+         <description key="moab.keydirectives" value="#MSUB -lnodes=1:ppn=1:cfc"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-26-11:25:39" user="11903"/>
+         <history mdyid="new.job.params" nvalue="FalseDiscoveryRate IN-CTD IN-IDXML tmp.idXML OUT-IDXML" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.breaktimeout" nvalue="0" ovalue="60" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.binary" nvalue="openmsSimple.sh" ovalue="dummyScript.sh" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.type0" nvalue="permament" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.maincount0" nvalue="1" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="1" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-CTD" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.file" nvalue="FalseDiscoveryRate.ctd" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-IDXML" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waiting" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waitingtmp" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breaktimeout" nvalue="60" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.type" nvalue="Sequence" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breakpoint" nvalue="none" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.binary" nvalue="dummyScript.sh" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.grid" nvalue="qbicheadnode.local" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.resource" nvalue="cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobistype" nvalue="binary" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobmanager" nvalue="-" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.gridtype" nvalue="moab" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+      </job>
+      <job name="IDFilter" text="IDFilter from the OpenMS library (peptide ID).&#10;&#10;IN-IDXML: input idXML file&#10;IN-CTD: parameter file&#10;&#10;OUT-IDXML: FDR-filtered peptide idXML file" x="797" y="202">
+         <input name="IN-IDXML" prejob="FalseDiscoveryRate" preoutput="2" seq="0" text="IN-IDXML: input idXML file" x="782" y="201">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="waitingtmp" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="waiting" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-IDXML"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <input name="IN-CTD" prejob="" preoutput="" seq="1" text="IN-CTD: parameter file" x="812" y="187">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="file" label="null" value="IDFilter.ctd"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-CTD"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <output name="OUT-IDXML" seq="2" text="OUT-IDXML: FDR-filtered peptide idXML file" x="857" y="201">
+            <port_prop desc="null" inh="null" key="maincount0" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="type0" label="null" value="permament"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="OUT-IDXML"/>
+            <port_prop desc="null" inh="null" key="maincount" label="null" value="1"/>
+         </output>
+         <execute desc="null" inh="null" key="binary" label="null" value="openmsSimple.sh"/>
+         <execute desc="null" inh="null" key="gridtype" label="null" value="moab"/>
+         <execute desc="null" inh="null" key="jobmanager" label="null" value="-"/>
+         <execute desc="null" inh="null" key="jobistype" label="null" value="binary"/>
+         <execute desc="null" inh="null" key="resource" label="null" value="cfc"/>
+         <execute desc="null" inh="null" key="grid" label="null" value="qbicheadnode.local"/>
+         <execute desc="null" inh="null" key="params" label="null" value="IDFilter IN-CTD IN-IDXML results.idXML OUT-IDXML"/>
+         <execute desc="null" inh="null" key="type" label="null" value="Sequence"/>
+         <description key="moab.keydirectives" value="#MSUB -lnodes=1:ppn=1:cfc"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-26-11:25:39" user="11903"/>
+         <history mdyid="modify.job.params" nvalue="IDFilter IN-CTD IN-IDXML results.idXML OUT-IDXML" ovalue="IDFilter IN-CTD IN-IDXML tmp.idXML OUT-IDXML" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.params" nvalue="IDFilter IN-CTD IN-IDXML tmp.idXML OUT-IDXML" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.breaktimeout" nvalue="0" ovalue="60" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.binary" nvalue="openmsSimple.sh" ovalue="dummyScript.sh" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.type0" nvalue="permament" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.maincount0" nvalue="1" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="1" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-CTD" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.file" nvalue="IDFilter.ctd" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-IDXML" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waiting" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waitingtmp" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breaktimeout" nvalue="60" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.type" nvalue="Sequence" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breakpoint" nvalue="none" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.binary" nvalue="dummyScript.sh" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.grid" nvalue="qbicheadnode.local" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.resource" nvalue="cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobistype" nvalue="binary" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobmanager" nvalue="-" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.gridtype" nvalue="moab" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+      </job>
+      <job name="IDMerger" text="IDMerger from the OpenMS library (peptide ID).&#10;&#10;IN-IDXML: input idXML file(s) (collector port)&#10;IN-CTD: parameter file&#10;&#10;OUT-IDXML: merged peptide idXML file" x="360" y="202">
+         <input name="IN-IDXML" prejob="XTandemAdapter" preoutput="3" seq="0" text="IN-IDXML: input idXML file(s) (collector port)" x="345" y="201">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="waitingtmp" label="null" value="all"/>
+            <port_prop desc="null" inh="null" key="waiting" label="null" value="all"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-IDXML"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <input name="IN-CTD" prejob="" preoutput="" seq="1" text="IN-CTD: parameter file" x="375" y="187">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="file" label="null" value="PeptideIndexer.ctd"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-CTD"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <output name="OUT-IDXML" seq="2" text="OUT-IDXML: merged peptide idXML file" x="420" y="201">
+            <port_prop desc="null" inh="null" key="maincount0" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="type0" label="null" value="permament"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="OUT-IDXML"/>
+            <port_prop desc="null" inh="null" key="maincount" label="null" value="1"/>
+         </output>
+         <execute desc="null" inh="null" key="gridtype" label="null" value="moab"/>
+         <execute desc="null" inh="null" key="binary" label="null" value="openmsMerging.sh"/>
+         <execute desc="null" inh="null" key="jobmanager" label="null" value="-"/>
+         <execute desc="null" inh="null" key="jobistype" label="null" value="binary"/>
+         <execute desc="null" inh="null" key="resource" label="null" value="cfc"/>
+         <execute desc="null" inh="null" key="grid" label="null" value="qbicheadnode.local"/>
+         <execute desc="null" inh="null" key="params" label="null" value="IDMerger IN-CTD IN-IDXML tmp.idXML OUT-IDXML"/>
+         <execute desc="null" inh="null" key="type" label="null" value="Sequence"/>
+         <description key="moab.keydirectives" value="#MSUB -lnodes=1:ppn=1:cfc"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-26-11:25:39" user="11903"/>
+         <history mdyid="modify.job.binary" nvalue="openmsMerging.sh" ovalue="openmsSimple.sh" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.params" nvalue="IDMerger IN-CTD IN-IDXML tmp.idXML OUT-IDXML" ovalue="IDMerger IN-CTD IN-IDXML_1 tmp.idXML OUT-IDXML" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.input.file" nvalue="PeptideIndexer.ctd" ovalue="IDMerger.ctd" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqlpass" nvalue="" ovalue="t3st1ng123!!" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqluser" nvalue="" ovalue="test@liferay.com" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.params" nvalue="IDMerger IN-CTD IN-IDXML_1 tmp.idXML OUT-IDXML" ovalue="IDMerger IN-CTD IN-IDXML tmp.idXML OUT-IDXML" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqlpass" nvalue="t3st1ng123!!" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqluser" nvalue="test@liferay.com" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.input.eparam" nvalue="0" ovalue="1" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqlpass" nvalue="" ovalue="t3st1ng123!!" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqluser" nvalue="" ovalue="test@liferay.com" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.input.eparam" nvalue="1" ovalue="0" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.input.waitingtmp" nvalue="all" ovalue="one" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.input.waiting" nvalue="all" ovalue="one" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqlpass" nvalue="t3st1ng123!!" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqluser" nvalue="test@liferay.com" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.breaktimeout" nvalue="0" ovalue="60" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.params" nvalue="IDMerger IN-CTD IN-IDXML tmp.idXML OUT-IDXML" ovalue="IN-IDXML OUT-IDXML" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.binary" nvalue="openmsSimple.sh" ovalue="dummyScript.sh" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.type0" nvalue="permament" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.maincount0" nvalue="1" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="1" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-CTD" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.file" nvalue="IDMerger.ctd" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-IDXML" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waiting" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waitingtmp" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breaktimeout" nvalue="60" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.type" nvalue="Sequence" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.params" nvalue="IN-IDXML OUT-IDXML" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breakpoint" nvalue="none" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.binary" nvalue="dummyScript.sh" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.grid" nvalue="qbicheadnode.local" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.resource" nvalue="cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobistype" nvalue="binary" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobmanager" nvalue="-" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.gridtype" nvalue="moab" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+      </job>
+      <job name="PeptideIndexer" text="PeptideIndexer from the OpenMS library (peptide ID).&#10;&#10;IN-IDXML: input idXML file&#10;IN-CTD: parameter file&#10;IN-FASTA: protein DB (with decoy information)&#10;&#10;OUT-IDXML: indexed peptide idXML file" x="503" y="202">
+         <input name="IN-IDXML" prejob="IDMerger" preoutput="2" seq="0" text="IN-IDXML: input idXML file" x="488" y="201">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="waitingtmp" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="waiting" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-IDXML"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <input name="IN-CTD" prejob="" preoutput="" seq="1" text="IN-CTD: parameter file" x="518" y="187">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="file" label="null" value="PeptideIndexer.ctd"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-CTD"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <input name="IN-FASTA" prejob="DecoyDatabase" preoutput="2" seq="2" text="IN-FASTA: protein DB (with decoy information)" x="488" y="248">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="waitingtmp" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="waiting" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-FASTA"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="2"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <output name="OUT-IDXML" seq="3" text="OUT-IDXML: indexed peptide idXML file" x="563" y="201">
+            <port_prop desc="null" inh="null" key="maincount0" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="OUT-IDXML"/>
+            <port_prop desc="null" inh="null" key="type0" label="null" value="permament"/>
+            <port_prop desc="null" inh="null" key="maincount" label="null" value="1"/>
+         </output>
+         <execute desc="null" inh="null" key="gridtype" label="null" value="moab"/>
+         <execute desc="null" inh="null" key="binary" label="null" value="openmsExtraParam.sh"/>
+         <execute desc="null" inh="null" key="jobmanager" label="null" value="-"/>
+         <execute desc="null" inh="null" key="jobistype" label="null" value="binary"/>
+         <execute desc="null" inh="null" key="resource" label="null" value="cfc"/>
+         <execute desc="null" inh="null" key="grid" label="null" value="qbicheadnode.local"/>
+         <execute desc="null" inh="null" key="params" label="null" value="PeptideIndexer IN-CTD IN-IDXML tmp.idXML OUT-IDXML -fasta IN-FASTA"/>
+         <execute desc="null" inh="null" key="type" label="null" value="Sequence"/>
+         <description key="moab.keydirectives" value="#MSUB -lnodes=1:ppn=1:cfc"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-26-11:25:39" user="11903"/>
+         <history mdyid="modify.job.params" nvalue="PeptideIndexer IN-CTD IN-IDXML tmp.idXML OUT-IDXML -fasta IN-FASTA" ovalue="PeptideIndexer IN-CTD IN-IDXML -out tmp.idXML OUT-IDXML -fasta IN-FASTA" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.params" nvalue="PeptideIndexer IN-CTD IN-IDXML -out tmp.idXML OUT-IDXML -fasta IN-FASTA" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.binary" nvalue="openmsExtraParam.sh" ovalue="dummyScript.sh" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.type0" nvalue="permament" ovalue="" port="3" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.maincount0" nvalue="1" ovalue="" port="3" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="2" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-FASTA" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waiting" nvalue="one" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waitingtmp" nvalue="one" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="1" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-CTD" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.file" nvalue="PeptideIndexer.ctd" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-IDXML" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waiting" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waitingtmp" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breaktimeout" nvalue="0" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.type" nvalue="Sequence" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breakpoint" nvalue="none" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.binary" nvalue="dummyScript.sh" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.grid" nvalue="qbicheadnode.local" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.resource" nvalue="cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobistype" nvalue="binary" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobmanager" nvalue="-" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.gridtype" nvalue="moab" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+      </job>
+      <job name="XTandemAdapter" text="X!TandemAdapter from the OpenMS library (peptide ID).&#10;&#10;IN-MZML: input mzML file(s) (with MS2 spectra)&#10;IN-CTD: X!TandemAdapter parameter file&#10;IN-FASTA: protein DB with appended decoy data&#10;&#10;OUT-IDXML: peptide idXML file(s)" x="216" y="202">
+         <input name="IN-MZML" prejob="DataStaging-mzML" preoutput="1" seq="0" text="IN-MZML: input mzML file(s) (with MS2 spectra)" x="215" y="187">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="waitingtmp" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="waiting" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-MZML"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <input name="IN-CTD" prejob="" preoutput="" seq="1" text="IN-CTD: X!TandemAdapter parameter file" x="246" y="187">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="file" label="null" value="XTandemAdapter.ctd"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-CTD"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <input name="IN-FASTA" prejob="DecoyDatabase" preoutput="2" seq="2" text="IN-FASTA: protein DB with appended decoy data" x="262" y="262">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
+            <port_prop desc="null" inh="null" key="waitingtmp" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="waiting" label="null" value="one"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="IN-FASTA"/>
+            <port_prop desc="null" inh="null" key="dpid" label="null" value="2"/>
+            <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
+         </input>
+         <output name="OUT-IDXML" seq="3" text="OUT-IDXML: peptide idXML file(s)" x="276" y="201">
+            <port_prop desc="null" inh="null" key="maincount0" label="null" value="1"/>
+            <port_prop desc="null" inh="null" key="type0" label="null" value="permament"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="OUT-IDXML"/>
+            <port_prop desc="null" inh="null" key="maincount" label="null" value="1"/>
+         </output>
+         <execute desc="null" inh="null" key="gridtype" label="null" value="moab"/>
+         <execute desc="null" inh="null" key="binary" label="null" value="openmsExtraParam.sh"/>
+         <execute desc="null" inh="null" key="jobmanager" label="null" value="-"/>
+         <execute desc="null" inh="null" key="jobistype" label="null" value="binary"/>
+         <execute desc="null" inh="null" key="useallthis" label="null" value="XTandemAdapter"/>
+         <execute desc="null" inh="null" key="resource" label="null" value="cfc"/>
+         <execute desc="null" inh="null" key="grid" label="null" value="qbicheadnode.local"/>
+         <execute desc="null" inh="null" key="params" label="null" value="XTandemAdapter IN-CTD IN-MZML tmp.idXML OUT-IDXML -database IN-FASTA"/>
+         <execute desc="null" inh="null" key="type" label="null" value="Sequence"/>
+         <description key="moab.keydirectives" value="#MSUB -lnodes=1:ppn=1:cfc"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-26-11:25:39" user="11903"/>
+         <history mdyid="modify.job.params" nvalue="XTandemAdapter IN-CTD IN-MZML tmp.idXML OUT-IDXML -database IN-FASTA" ovalue="XTandemAdapter IN-CTD IN-MZML tmp.idXML OUT-IDXML &quot;-database IN-FASTA&quot;" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.params" nvalue="XTandemAdapter IN-CTD IN-MZML tmp.idXML OUT-IDXML &quot;-database IN-FASTA&quot;" ovalue="XTandemAdapter IN-CTD IN-MZML OUT-IDXML -database IN-FASTA" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqluser" nvalue="" ovalue="test@liferay.com" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="delete.input.sqlpass" nvalue="" ovalue="t3st1ng123!!" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.input.eparam" nvalue="0" ovalue="1" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqluser" nvalue="test@liferay.com" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.sqlpass" nvalue="t3st1ng123!!" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.input.eparam" nvalue="1" ovalue="0" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.useallthis" nvalue="XTandemAdapter" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="modify.job.breaktimeout" nvalue="0" ovalue="60" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.desc.moab.keydirectives" nvalue="#MSUB -lnodes=1:ppn=1:cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.type0" nvalue="permament" ovalue="" port="3" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.output.maincount0" nvalue="1" ovalue="" port="3" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="2" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-FASTA" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waiting" nvalue="one" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waitingtmp" nvalue="one" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="2" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="1" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-CTD" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.file" nvalue="XTandemAdapter.ctd" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="1" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.pequaltype" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.dpid" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.intname" nvalue="IN-MZML" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waiting" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.waitingtmp" nvalue="one" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.input.eparam" nvalue="0" ovalue="" port="0" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breaktimeout" nvalue="60" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.type" nvalue="Sequence" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.params" nvalue="XTandemAdapter IN-CTD IN-MZML OUT-IDXML -database IN-FASTA" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.breakpoint" nvalue="none" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.resource" nvalue="cfc" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.grid" nvalue="qbicheadnode.local" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobistype" nvalue="binary" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.jobmanager" nvalue="-" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.binary" nvalue="openmsExtraParam.sh" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+         <history mdyid="new.job.gridtype" nvalue="moab" ovalue="" port="-" tim="2015-02-25-17:20:21" user="11903"/>
+      </job>
+   </real>
+</workflow>

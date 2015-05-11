@@ -1,0 +1,20 @@
+#!/bin/bash
+# list of files going in...
+# multiple text files with the respective pathnames
+
+module load lib/openms/1.11
+$1 -ini $2 -in `for i in $3_*; do cat $i; done` -out $4
+
+# We want to propagate the workspace dir (where the input files were staged to on scratch...)
+currdir=$(dirname `cat $3_0`)
+parentdir=$(dirname $currdir)
+jobdir=$parentdir/$1_${PWD##*/}
+
+mkdir $jobdir
+mv $4 $jobdir/
+
+for i in *.log; do cp $i $jobdir/$1_${PWD##*/}_$i; done
+
+ls -1 $jobdir/$4 > $5
+
+

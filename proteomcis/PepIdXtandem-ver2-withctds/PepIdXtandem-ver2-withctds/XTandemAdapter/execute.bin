@@ -1,0 +1,22 @@
+#!/bin/bash
+# calls openms tools with extra params in argument $6, $7
+# $6 is openms param name (e.g. -database) and $7 filepath written in text file
+
+module load lib/openms/1.11
+module load bio/xtandem/201309011-gnu-4.8
+
+$1 -ini $2 -in `cat $3` -out $4 $6 `cat $7`
+
+
+# We want to propagate the workspace dir (where the input files were staged to on scratch...)
+currdir=$(dirname `head -n1 $3`)
+parentdir=$(dirname $currdir)
+jobdir=$parentdir/$1_${PWD##*/}
+
+mkdir $jobdir
+mv $4 $jobdir/
+for i in *.log; do cp $i $jobdir/$1_${PWD##*/}_$i; done
+
+ls -1 $jobdir/$4 > $5
+
+

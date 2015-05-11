@@ -1,0 +1,22 @@
+#!/bin/bash
+# list of files going in...
+# multiple text files with the respective pathnames
+
+# use a unique copy job identifier...
+JOBUID=$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32)
+JOBNAME=$(cat $2)
+REGNAME=$(cat $3)
+
+#scp $1 qeana10@qbicheadnode.local:/home-link/qeana10/qPostman/jobs/$JOBUID
+cp $1 /lustre_cfc/qbic/staging/jobids/$JOBUID
+
+/home-link/qeana10/qPostman/qPostman.py /lustre_cfc/qbic/staging/jobids/$JOBUID -jobname $JOBNAME -registername $REGNAME -outmode
+
+
+if [ $? = 0  ]; then
+      #CAUTION: this dropbox is also hardcoded in qPostman
+        touch "/mnt/nfs/qbic/openbis_dss/QBiC-register-wf-peptideid/.MARKER_is_finished_"$REGNAME
+    fi
+    #SSH_COMMAND='/home-link/qeana10/qPostman/qPostman.py /home-link/qeana10/qPostman/jobs/'$JOBUID' -jobname '$JOBNAME' -registername '$REGNAME' -outmode'
+
+    #ssh qeana10@qbicheadnode.local $SSH_COMMAND
