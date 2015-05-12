@@ -1,12 +1,17 @@
 #!/bin/bash
+module load qbic/anaconda
 
 dropbox=$(cat $3)
 registername=$(cat $1)
 wfdir=$(cat $2)
-wfdir_base=$(basename $wfdir)
-dbdir=$registername"-"$wfdir_base
-copyied=$dropbox"/"$dbdir
-echo "copying "$wfdir" to "$dropbox" with name "$copyied 
-cp -r $wfdir $dropobx"/"$copyied
-touch $dropbox"/.MARKER_is_finished_"$dbdir
-echo "results written to dropbox"
+user=$(whoami)
+
+echo "qproject commit -t $wfdir --dropbox $dropbox --barcode $registername --user $user"
+qproject commit -t $wfdir --dropbox $dropbox --barcode $registername --user $user
+if [ $? = 0  ]; then
+    touch $dropbox"/.MARKER_is_finished_"$registername
+    echo "results written to dropbox"
+else
+    echo "qproject commit failed"
+    return -1
+fi
