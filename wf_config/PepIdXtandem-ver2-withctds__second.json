@@ -1,0 +1,247 @@
+{"workflow": {
+   "id":"PepIdXtandem-ver2-withctds",
+   "description": "This workflow uses the peptide search engine X!Tandem (http://www.thegpm.org/TANDEM/index.html) to perform the assignment of peptide sequences to MS2 spectra. The whole workflow includes several other openMS (www.openms.de) tools that allow statistical assessment and a false discovery rate (FDR) - based filtering.",
+   "experimenttype": "Q_WF_MS_PEPTIDEID",
+   "filedirectory": "/home/wojnar/QBiC/workflows/guse_workflows/test_guseWorkflowFileSystem/PepIdXtandem-ver2-withctds",
+   "name": "X!Tandem Peptide ID (LC-MS-based Proteomics).",
+   "nodes": [
+      {
+         "cmdparams": [],
+         "description": "Data staging node to provide the input of the following node.\n\nIN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths in the openBIS DSS). This information comes from the portal.\n\nIN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.\n\nOUT-STAGEDFILES: Generator port yielding a list of the staged files.",
+         "grid": "qbicheadnode.local",
+         "gridtype": "moab",
+         "inputports": [
+            {
+               "description": "IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.",
+               "name": "IN-JOBNAME",
+               "parameters": [{
+                  "default": "wftesting",
+                  "description": "workflow job name",
+                  "name": "",
+                  "range": [],
+                  "type": "String"
+               }],
+               "portnumber": 2,
+               "type": "JOBNAME"
+            },
+            {
+               "description": "IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths in the openBIS DSS). This information comes from the portal.",
+               "name": "IN-FILESTOSTAGE",
+               "parameters": [{
+                  "default": "/lustre_cfc/qbic/WF_testing/inputFiles/uniprot-human.fasta",
+                  "description": "Input file",
+                  "name": "Database-fasta.1.db",
+                  "range": [
+                     "fasta",
+                     "fa"
+                  ],
+                  "type": "File"
+               }],
+               "portnumber": 0,
+               "type": "FILESTOSTAGE"
+            }
+         ],
+         "moabkeydirectives": [],
+         "name": "DataStaging-fasta",
+         "resource": "cfc"
+      },
+      {
+         "cmdparams": [],
+         "description": "FalseDiscoveryRate from the OpenMS library (peptide ID).\n\nIN-IDXML: input idXML file\nIN-CTD: parameter file\n\nOUT-IDXML: peptide idXML file with annotated FDR",
+         "grid": "qbicheadnode.local",
+         "gridtype": "moab",
+         "inputports": [],
+         "moabkeydirectives": [],
+         "name": "FalseDiscoveryRate",
+         "resource": "cfc"
+      },
+      {
+         "cmdparams": [],
+         "description": "IDFilter from the OpenMS library (peptide ID).\n\nIN-IDXML: input idXML file\nIN-CTD: parameter file\n\nOUT-IDXML: FDR-filtered peptide idXML file",
+         "grid": "qbicheadnode.local",
+         "gridtype": "moab",
+         "inputports": [],
+         "moabkeydirectives": [],
+         "name": "IDFilter",
+         "resource": "cfc"
+      },
+      {
+         "cmdparams": [
+            "XTandemAdapter",
+            "IN-CTD",
+            "IN-MZML",
+            "tmp.idXML",
+            "OUT-IDXML",
+            "-database",
+            "IN-FASTA"
+         ],
+         "description": "X!TandemAdapter from the OpenMS library (peptide ID).\n\nIN-MZML: input mzML file(s) (with MS2 spectra)\nIN-CTD: X!TandemAdapter parameter file\nIN-FASTA: protein DB with appended decoy data\n\nOUT-IDXML: peptide idXML file(s)",
+         "grid": "qbicheadnode.local",
+         "gridtype": "moab",
+         "inputports": [{
+            "description": "IN-CTD: X!TandemAdapter parameter file",
+            "name": "IN-CTD",
+            "parameters": [
+               {
+                  "default": "ppm",
+                  "description": "Parent monoisotopic mass error units",
+                  "name": "XTandemAdapter.1.precursor_error_units",
+                  "range": [
+                     "ppm",
+                     "Da"
+                  ],
+                  "type": "String"
+               },
+               {
+                  "default": 1.5,
+                  "description": "Precursor mass tolerance",
+                  "name": "XTandemAdapter.1.precursor_mass_tolerance",
+                  "range": [
+                     -3.4028234663852886E38,
+                     3.4028234663852886E38
+                  ],
+                  "type": "Float"
+               },
+               {
+                  "default": "Da",
+                  "description": "Fragment monoisotopic mass error units",
+                  "name": "XTandemAdapter.1.fragment_error_units",
+                  "range": [
+                     "ppm",
+                     "Da"
+                  ],
+                  "type": "String"
+               },
+               {
+                  "default": 0.3,
+                  "description": "Fragment mass error",
+                  "name": "XTandemAdapter.1.fragment_mass_tolerance",
+                  "range": [
+                     -3.4028234663852886E38,
+                     3.4028234663852886E38
+                  ],
+                  "type": "Float"
+               }
+            ],
+            "portnumber": 1,
+            "type": "CTD"
+         }],
+         "moabkeydirectives": [
+            "#MSUB",
+            "-lnodes=1:ppn=1:cfc"
+         ],
+         "name": "XTandemAdapter",
+         "resource": "cfc"
+      },
+      {
+         "cmdparams": [],
+         "description": "PeptideIndexer from the OpenMS library (peptide ID).\n\nIN-IDXML: input idXML file\nIN-CTD: parameter file\nIN-FASTA: protein DB (with decoy information)\n\nOUT-IDXML: indexed peptide idXML file",
+         "grid": "qbicheadnode.local",
+         "gridtype": "moab",
+         "inputports": [],
+         "moabkeydirectives": [],
+         "name": "PeptideIndexer",
+         "resource": "cfc"
+      },
+      {
+         "cmdparams": [],
+         "description": "Data staging node providing the primary data (mzML) to the workflow.\n\nIN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths in the openBIS DSS). This information comes from the portal.\n\nIN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.\n\nOUT-STAGEDFILES: Generator port yielding a list of the staged files.",
+         "grid": "qbicheadnode.local",
+         "gridtype": "moab",
+         "inputports": [
+            {
+               "description": "IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.",
+               "name": "IN-JOBNAME",
+               "parameters": [{
+                  "default": "wftesting",
+                  "description": "workflow job name",
+                  "name": "",
+                  "range": [],
+                  "type": "String"
+               }],
+               "portnumber": 2,
+               "type": "JOBNAME"
+            },
+            {
+               "description": "IN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths in the openBIS DSS). This information comes from the portal.",
+               "name": "IN-FILESTOSTAGE",
+               "parameters": [{
+                  "default": [
+                     "/lustre_cfc/qbic/WF_testing/inputFiles/velos005614.mzML",
+                     "/lustre_cfc/qbic/WF_testing/inputFiles/velos005615.mzML",
+                     "/lustre_cfc/qbic/WF_testing/inputFiles/velos005616.mzML"
+                  ],
+                  "description": "input file(s) for mzml.",
+                  "name": "InputFile.1.in",
+                  "range": ["mzml"],
+                  "type": "FileList"
+               }],
+               "portnumber": 0,
+               "type": "FILESTOSTAGE"
+            }
+         ],
+         "moabkeydirectives": [],
+         "name": "DataStaging-mzML",
+         "resource": "cfc"
+      },
+      {
+         "cmdparams": [],
+         "description": "Data staging node writing back the results to openBIS.\n\nIN-FILESTOSTAGE: A text file containing the absolute paths of each file in a row (paths of result files on scratch).\n\nIN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.\n\nIN-REGISTERNAME: This is the prefix of the results folder name (e.g. SPACE-PROJECT-EXPERIMENT) that is reported back to openBIS.",
+         "grid": "qbicheadnode.local",
+         "gridtype": "moab",
+         "inputports": [
+            {
+               "description": "IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.",
+               "name": "IN-JOBNAME",
+               "parameters": [{
+                  "default": "wftesting",
+                  "description": "workflow job name",
+                  "name": "",
+                  "range": [],
+                  "type": "String"
+               }],
+               "portnumber": 1,
+               "type": "JOBNAME"
+            },
+            {
+               "description": "IN-REGISTERNAME: This is the prefix of the results folder name (e.g. SPACE-PROJECT-EXPERIMENT) that is reported back to openBIS",
+               "name": "IN-REGISTERNAME",
+               "parameters": [{
+                  "default": "CHICKEN_FARM-QMELA-QMELAE1",
+                  "description": "Prefix used to register the results of this workflow.",
+                  "name": "",
+                  "range": [],
+                  "type": "String"
+               }],
+               "portnumber": 2,
+               "type": "REGISTERNAME"
+            }
+         ],
+         "moabkeydirectives": [],
+         "name": "DataStaging-writeResults",
+         "resource": "cfc"
+      },
+      {
+         "cmdparams": [],
+         "description": "DecoyDatabase from the OpenMS library (peptide ID).\n\nIN-FASTA: protein DB (without decoy information)\nIN-CTD: parameter file (-append decoys)\n\nOUT-FASTA: protein DB with appended decoy data",
+         "grid": "qbicheadnode.local",
+         "gridtype": "moab",
+         "inputports": [],
+         "moabkeydirectives": [],
+         "name": "DecoyDatabase",
+         "resource": "cfc"
+      },
+      {
+         "cmdparams": [],
+         "description": "IDMerger from the OpenMS library (peptide ID).\n\nIN-IDXML: input idXML file(s) (collector port)\nIN-CTD: parameter file\n\nOUT-IDXML: merged peptide idXML file",
+         "grid": "qbicheadnode.local",
+         "gridtype": "moab",
+         "inputports": [],
+         "moabkeydirectives": [],
+         "name": "IDMerger",
+         "resource": "cfc"
+      }
+   ],
+   "sampletype": "Q_WF_MS_PEPTIDEID_RUN",
+   "version": "0.3"
+}}

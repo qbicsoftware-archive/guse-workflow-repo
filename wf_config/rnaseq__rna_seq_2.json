@@ -1,0 +1,146 @@
+{"workflow": {
+   "description": "Rna Seq Workflow",
+   "experimenttype": "Q_WF_NGS_RNA_EXPRESSION_ANALYSIS",
+   "filedirectory": "/home/wojnar/QBiC/workflows/guse_workflows/test_guseWorkflowFileSystem/rnaseq",
+   "id": "rnaseq",
+   "name": "Rna Seq Workflow",
+   "nodes": [
+      {
+         "cmdparams": [],
+         "description": "writes results back to a dropbox.",
+         "grid": "qbicheadnode.local",
+         "gridtype": "moab",
+         "inputports": [
+            {
+               "description": "should contain the dropbox path.",
+               "name": "DROPBOX",
+               "parameters": [{
+                  "default": "/tmp",
+                  "description": "write results to this dropbox",
+                  "name": "dropbox",
+                  "range": [],
+                  "type": "String"
+               }],
+               "portnumber": 1,
+               "type": "DROPBOX"
+            },
+            {
+               "description": "IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.",
+               "name": "IN-JOBNAME",
+               "parameters": [{
+                  "default": "qbic_test_jobname",
+                  "description": "workflow job name",
+                  "name": "",
+                  "range": [],
+                  "type": "String"
+               }],
+               "portnumber": 3,
+               "type": "JOBNAME"
+            },
+            {
+               "description": "IN-REGISTERNAME: This is the prefix of the results folder name (e.g. SPACE-PROJECT-EXPERIMENT) that is reported back to openBIS.",
+               "name": "IN-REGISTERNAME",
+               "parameters": [{
+                  "default": "space-project-experiment",
+                  "description": "Prefix used to register the results of this workflow.",
+                  "name": "",
+                  "range": [],
+                  "type": "String"
+               }],
+               "portnumber": 2,
+               "type": "REGISTERNAME"
+            }
+         ],
+         "moabkeydirectives": [],
+         "name": "Commit",
+         "resource": "cfc"
+      },
+      {
+         "cmdparams": [],
+         "description": "This node is the actual workflow that is going to be executed. It can be a batch script, a snakemake script a guse subworkflow or anything else.",
+         "grid": "qbicheadnode.local",
+         "gridtype": "moab",
+         "inputports": [],
+         "moabkeydirectives": [],
+         "name": "Workflow",
+         "resource": "cfc"
+      },
+      {
+         "cmdparams": [],
+         "description": "This job allocates a workspace for this workflow and prepares the project structure for the snakemake workflow that will be executed.",
+         "grid": "qbicheadnode.local",
+         "gridtype": "moab",
+         "inputports": [
+            {
+               "description": "This workflow will be executed for this user.",
+               "name": "IN-USER",
+               "parameters": [{
+                  "default": "iiswo01",
+                  "description": "User for whome the workflow will be executed.",
+                  "name": "",
+                  "range": [],
+                  "type": "String"
+               }],
+               "portnumber": 2,
+               "type": "USER"
+            },
+            {
+               "description": "IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes.",
+               "name": "IN-JOBNAME",
+               "parameters": [{
+                  "default": "qbic_test_jobname",
+                  "description": "workflow job name",
+                  "name": "",
+                  "range": [],
+                  "type": "String"
+               }],
+               "portnumber": 1,
+               "type": "JOBNAME"
+            },
+            {
+               "description": "IN-REGISTERNAME: This is the prefix of the results folder name (e.g. SPACE-PROJECT-EXPERIMENT) that is reported back to openBIS",
+               "name": "IN-REGISTERNAME",
+               "parameters": [{
+                  "default": "space-project-experiment",
+                  "description": "Prefix used to register the results of this workflow.",
+                  "name": "",
+                  "range": [],
+                  "type": "String"
+               }],
+               "portnumber": 0,
+               "type": "REGISTERNAME"
+            },
+            {
+               "description": "one or more files, which should be staged. ",
+               "name": "IN-FILESTOSTAGE",
+               "parameters": [
+                  {
+                     "default": ["/lustre_cfc/qbic/qbic_projects/SGOX/mzml/20150114124851_20150112_CO_0520SiDG_QBIC_R02_QSGOX003AB.fastq"],
+                     "description": "mzml files on which to perform qualitiy control.",
+                     "name": "InputFiles.1.input",
+                     "range": [
+                        "fastq",
+                        "fastq.gz"
+                     ],
+                     "type": "FileList"
+                  },
+                  {
+                     "default": "/lustre_cfc/qbic/reference_genomes/Mus_musculus/DNA/UCSC_mm10/Sequence/Bowtie2Index:/lustre_cfc/qbic/reference_genomes/Mus_musculus/DNA/UCSC_mm10/annotation/genes.gtf",
+                     "description": "database to perform.",
+                     "name": "InputFiles.1.db",
+                     "range": ["gtf"],
+                     "type": "File"
+                  }
+               ],
+               "portnumber": 3,
+               "type": "FILESTOSTAGE"
+            }
+         ],
+         "moabkeydirectives": [],
+         "name": "Initialization",
+         "resource": "cfc"
+      }
+   ],
+   "sampletype": "Q_WF_NGS_RNA_EXPRESSION_ANALYSIS_RUN",
+   "version": "0.1"
+}}
