@@ -1,0 +1,17 @@
+{"dropboxpaths": {
+   "paths": [{
+"sampletype":"Q_WF_MS_PEPTIDEID_RUN",
+"dropboxpath":"/mnt/nfs/qbic/openbis_dss/QBiC-register-wf-peptideid"
+},
+{
+"sampletype":"Q_WF_MS_QUALITYCONTROL_RUN",
+"dropboxpath":"/mnt/nfs/qbic/openbis_dss/QBiC-register-wf-msqc"
+},
+{
+"sampletype":"Q_WF_NGS_RNA_EXPRESSION_ANALYSIS_RUN",
+"dropboxpath":"/mnt/nfs/qbic/openbis_dss/QBiC-register-wf-msqc"
+}
+]
+}
+}
+
