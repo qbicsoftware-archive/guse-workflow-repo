@@ -246,7 +246,7 @@
             <port_prop desc="null" inh="null" key="maincount" label="null" value="1"/>
          </output>
          <execute desc="null" inh="null" key="gridtype" label="null" value="moab"/>
-         <execute desc="null" inh="null" key="binary" label="null" value="C:/fakepath/workflow.sh.app.tgz"/>
+         <execute desc="null" inh="null" key="binary" label="null" value="C:/fakepath/workflow.sh"/>
          <execute desc="null" inh="null" key="jobmanager" label="null" value="-"/>
          <execute desc="null" inh="null" key="jobistype" label="null" value="binary"/>
          <execute desc="null" inh="null" key="resource" label="null" value="cfc"/>
