@@ -1,0 +1,33 @@
+#!/bin/bash
+#PBS -q cfc
+#PBS -A qbic
+#PBS -l nodes=1:ppn=10:cfc
+#PBS -l walltime=40:00:00
+# properties = {properties}
+
+module load qbic/mqrun
+
+WORKDIR=$(pwd)
+# Directory where the script is stored.
+# See https://stackoverflow.com/questions/59895/
+SCRIPTDIR="/lustre_cfc/software/qbic/mqrun/0.1/bin"
+
+if [ ! -d ${SCRIPTDIR}/../virtenv  ] ; then
+    echo "Could not find virtual environment in ${SCRIPTDIR}" 1>&2
+    exit 1
+fi
+
+# load the virtual environment
+source ${SCRIPTDIR}/../virtenv/bin/activate ${SCRIPTDIR}/../virtenv
+
+cd ${WORKDIR}
+echo "Starting mqrun"
+${SCRIPTDIR}/../virtenv/bin/mqrun -i ${SCRIPTDIR}/../root.qcow2 --mem=30G --sockets=1 --cores=10 --cache unsafe ../var/output.tar ../etc/params.json ../data/* ../ref/*  ${SCRIPTDIR}/../mqrun-0.1.zip
+
+[ $? -eq 0  ] || ( echo "mqrun returned non zero exit code $?" && exit 1  )
+
+if [ ! -f "output.tar"  ] ; then
+    echo "mqrun finished with non zero exit code but output file does not exist" 1>&2
+    exit 1
+fi
+echo "mqrun finished successfully"
