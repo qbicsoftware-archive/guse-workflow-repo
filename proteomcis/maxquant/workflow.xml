@@ -1,3 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<workflow download="all" export="proj" mainabst="" maingraf="snakemake_execution_graph4" mainreal="maxquant" name="maxquant">
+   <graf name="snakemake_execution_graph4" text="Description of Graph">
+      <job name="Workflow" text="This node is the actual workflow that is going to be executed. It can be a batch script, a snakemake script a guse subworkflow or anything else." x="198" y="216">
+         <input name="wfdir" prejob="Initialization" preoutput="4" seq="0" text="directory of the src directory" x="183" y="215"/>
+         <input name="srcdir" prejob="Initialization" preoutput="7" seq="1" text="source directory of the snakemake workflow" x="183" y="231"/>
+         <output name="wfdir2" seq="2" text="workflow main directory." x="258" y="215"/>
+      </job>
+      <job name="Initialization" text="This job allocates a workspace for this workflow and prepares the project structure for the snakemake workflow that will be executed." x="54" y="215">
+         <input name="IN-REGISTERNAME" prejob="" preoutput="" seq="0" text="IN-REGISTERNAME: This is the prefix of the results folder name (e.g. SPACE-PROJECT-EXPERIMENT) that is reported back to openBIS" x="114" y="245"/>
+         <input name="IN-JOBNAME" prejob="" preoutput="" seq="1" text="IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes." x="69" y="200"/>
+         <input name="IN-USER" prejob="" preoutput="" seq="2" text="This workflow will be executed for this user." x="84" y="200"/>
+         <input name="IN-FILESTOSTAGE" prejob="" preoutput="" seq="3" text="one or more files, which should be staged. " x="100" y="200"/>
+         <input name="INIT-CTD" prejob="" preoutput="" seq="5" text="ctd files which contains information for the initialization process." x="114" y="261"/>
+         <input name="WORKFLOW-CTD" prejob="" preoutput="" seq="6" text="a ctd parameter file that contains ctd enabled tools of the workflow." x="53" y="200"/>
+         <output name="wfdir" seq="4" text="wfdir" x="114" y="214"/>
+         <output name="srcdir" seq="7" text="source directory of the snakemake workflow." x="114" y="230"/>
+      </job>
+      <job name="Commit" text="writes results back to a dropbox." x="308" y="216">
+         <input name="wfdir" prejob="Workflow" preoutput="2" seq="0" text="workflow main directory, created by qproject." x="293" y="215"/>
+         <input name="DROPBOX" prejob="" preoutput="" seq="1" text="should contain the dropbox path." x="323" y="201"/>
+         <input name="IN-REGISTERNAME" prejob="" preoutput="" seq="2" text="IN-REGISTERNAME: This is the prefix of the results folder name (e.g. SPACE-PROJECT-EXPERIMENT) that is reported back to openBIS." x="307" y="201"/>
+         <input name="IN-JOBNAME" prejob="" preoutput="" seq="3" text="IN-JOBNAME: The job name is used as the main folder for the workflow's temporary, log, and result files. Should be the same for all data staging nodes." x="338" y="201"/>
+      </job>
+   </graf>
+   <real abst="" graf="snakemake_execution_graph4" name="maxquant" text="2015-4-21">
+      <job name="Commit" text="writes results back to a dropbox." x="308" y="216">
+         <input name="wfdir" prejob="Workflow" preoutput="2" seq="0" text="workflow main directory, created by qproject." x="293" y="215">
+            <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
             <port_prop desc="null" inh="null" key="waitingtmp" label="null" value="one"/>
             <port_prop desc="null" inh="null" key="waiting" label="null" value="one"/>
             <port_prop desc="null" inh="null" key="intname" label="null" value="wfdir"/>
@@ -73,10 +102,10 @@
             <port_prop desc="null" inh="null" key="dpid" label="null" value="5"/>
             <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
          </input>
-         <input name="WORKFLOW-CTD-ZIPPED" prejob="" preoutput="" seq="6" text="a ctd parameter file that contains ctd enabled tools of the workflow." x="53" y="200">
+         <input name="WORKFLOW-CTD" prejob="" preoutput="" seq="6" text="a ctd parameter file that contains ctd enabled tools of the workflow." x="53" y="200">
             <port_prop desc="null" inh="null" key="eparam" label="null" value="0"/>
-            <port_prop desc="null" inh="null" key="file" label="null" value="C:/fakepath/WORKFLOW-JSON"/>
-            <port_prop desc="null" inh="null" key="intname" label="null" value="WORKFLOW-JSON"/>
+            <port_prop desc="null" inh="null" key="file" label="null" value="C:/fakepath/WORKFLOW-CTD"/>
+            <port_prop desc="null" inh="null" key="intname" label="null" value="WORKFLOW-CTD"/>
             <port_prop desc="null" inh="null" key="dpid" label="null" value="6"/>
             <port_prop desc="null" inh="null" key="pequaltype" label="null" value="0"/>
          </input>
@@ -99,7 +128,7 @@
          <execute desc="null" inh="null" key="resource" label="null" value="cfc"/>
          <execute desc="null" inh="null" key="grid" label="null" value="qbicheadnode.local"/>
          <execute desc="null" inh="null" key="tmp*resource" label="null" value="cfc"/>
-         <execute desc="null" inh="null" key="params" label="null" value="INIT-CTD IN-JOBNAME IN-REGISTERNAME IN-USER IN-FILESTOSTAGE WORKFLOW-JSON"/>
+         <execute desc="null" inh="null" key="params" label="null" value="INIT-CTD IN-JOBNAME IN-REGISTERNAME IN-USER IN-FILESTOSTAGE WORKFLOW-CTD"/>
          <execute desc="null" inh="null" key="type" label="null" value="Sequence"/>
          <execute desc="null" inh="null" key="tmp*grid" label="null" value="qbicheadnode.local"/>
          <description key="moab.keydirectives" value="#MSUB -l nodes=1:qbicds -A qbicds -q qbicds"/>
