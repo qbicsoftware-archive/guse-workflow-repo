@@ -37,17 +37,17 @@ results and logs can be seen and used by our users.
 A guse workflow has the following directory structure:
 
 workflow-main-directory
-+--workflow.xml
-+--workflow-directory
-  +--Initialization
-    +--execute.bin
-    +--inputs
-  +--Workflow
-    +--execute.bin
-    +--inputs
-  +--Commit
-    +--execute.bin
-    +--inputs
+├──workflow.xml
+└──workflow-directory
+   ├──Initialization
+   │   ├──execute.bin
+   │   └──inputs
+   ├──Workflow
+   │  ├──execute.bin
+   │  └──inputs
+   └──Commit
+      ├──execute.bin
+      └──inputs
 
 **execute.bin** might be a shell script, a python script, an executable, or even a
 tar ball. See [guse-workflow-scripts](https://github.com/qbicsoftware/guse-workflow-scripts).
